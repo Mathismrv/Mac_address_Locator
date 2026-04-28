@@ -1,6 +1,4 @@
-# Ignore tout par défaut
 /*
-# Sauf les fichiers spécifiques pour ce projet
 !/MAC_address_Locator.py
 !/README.md
 !/.gitignore
