@@ -68,5 +68,15 @@ Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans
 - **param mac_address** : Notre MAC address cible.
 - **return** : retourne la ligne où est trouvée l'adresse MAC.
 
+### 'EntryToCorrectFormat(UserInput)'
+Cette fonction permet de mettre sous format une addresse MAC donnée de la forme : "00:11:22:33:44:55", "00-11-22-33-44-55", "0011.2233.4455", "001122334455" et la variantes avec espaces, et la traduit sous forme "XX:XX:XX:XX:XX:XX"
+-**param UserInput**: L'adresse MAC entrée par l'utilisateur
+-**return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
+
+### 'CleanPort(port)'
+Fonction qui sert a nettoyer la sortie du port pour n'afficher que le port 
+- **param port**: port a nettoyé
+- **return**: port tout propre
+
 ### `main()`
 Fonction principale du script qui coordonne les actions (appels CLI, requêtes GraphQL, changements de switch) pour localiser la MAC cible.

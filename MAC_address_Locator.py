@@ -3,12 +3,20 @@
 #@DetailDescriptionStart
 #This script allows you to find the tunnel associated with a given MAC address in a VOSS/Fabric Engine network
 #@DetailDescriptionEnd
-#@SectionStart (description = \"Mac address Locator\")
+#@SectionStart (description = Mac address Locator)
 #    @VariableFieldLabel (
-#        description = \"Enter MAC\",
+#        description = Enter MAC,
 #        type = string,
 #        required = yes,
 #        name = userInput_MAC_Address,
+#    )#@SectionEnd
+#@SectionStart (description = Debug)
+#    @VariableFieldLabel (
+#        description = Debug,
+#        type = string,
+#        required = no,
+#        validValues = [Enable, Disable],
+#        name = userInput_debug,
 #    )#@SectionEnd
 #@MetaDataEnd
 '''
@@ -64,7 +72,7 @@ def ExecuteGraphQL(query_string):
     :param query_string: Requete GraphQL sous forme de string
     :return: Reponse de la requete GraphQL
      exemple:
-    raw_query = \'''
+    raw_query = \'''ccccc
         query {
             network {
                 devices {
@@ -101,7 +109,6 @@ def getSwitchIP(GraphQl_response, Switch_Name):
         print("KeyError lors de l'extraction de l'IP du switch: " + str(e))
         return "Error: Key not found in GraphQL response"
 
-
 def IsLocal(line) :
     '''
     La fonction permet de verifie si la ligne de la table mac fournit est bien en local ou non.
@@ -114,7 +121,7 @@ def IsLocal(line) :
             print("La mac address n est pas en local sur ce switch")
             return 0
         if parts[4] == "LOCAL":
-            print("Gagne, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et sur le port: " + parts[3])
+            print("Gagne, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et sur le port: " + CleanPort(parts[3]))
             return 1
     except IndexError:
         print("Format inattendu pour la ligne: " + line)
@@ -132,18 +139,48 @@ def getSwitchPrompt():
         raw_output = result.getOutput()
         lignes = raw_output.splitlines()
         if lignes:
-            return lignes[-1].strip()
+            Prompt=lignes[-1].strip()
+            Prompt = Prompt.replace(":1>", "").strip()
+            return Prompt
+
     return "Prompt non trouvé"
 
+def CleanPort(port):
+    '''
+    Fonction qui sert a nettoyer la sortie du port pour n'afficher que le port
+    :param port: port a nettoyé
+    :return: port tout propre
+    '''
+    if (":" in port):
+        port=port.split(":")
+        return port[1]
+    if ("-" in port):
+        port=port.split("-")
+        return port[1]
+
+
+def EntryToCorrectFormat(UserInput):
+    '''
+    Nettoie l'entrée MAC de tous les symboles, vérifie qu'il reste 12 caractères hexadécimaux,
+    et les colle au format "xx:xx:xx:xx:xx:xx".
+    Accepte n'importe quel format du moment qu'il y a 12 caractères hexadécimaux valides.
+    :param UserInput: L'adresse MAC entrée par l'utilisateur
+    :return: L'adresse MAC au format "xx:xx:xx:xx:xx:xx" ou l'entrée d'origine si invalide.
+    '''
+    if UserInput is None:
+        return UserInput
+
+    s = str(UserInput).strip().lower()
+    hexchars = re.sub(r'[^0-9a-f]', '', s)
+    if len(hexchars) == 12:
+        return ':'.join(hexchars[i:i+2]for i in range(0, len(hexchars),2))
+    print("Erreur: entrée MAC invalide '{UserInput}' ")
+    return UserInput
 
 
 def main():
-    MAC_cible = emc_vars['userInput_MAC_Address'].strip()
-    #on recupere l'adresse MAC cible depuis les variables d'entrée de l'utilisateur
-    if not re.match(r'^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$', MAC_cible):
-        print("Format invalide. Attendu: XX:XX:XX:XX:XX:XX")
-        #on verifie que le format est correct
-        return
+    MAC_cible = emc_vars['userInput_MAC_Address']
+    MAC_cible=EntryToCorrectFormat(MAC_cible)
 
     command = "show vlan mac-address-entry mac " + MAC_cible
 
@@ -169,7 +206,7 @@ def main():
         if linebis is None:
             parts = result.split()
             status = parts[1]
-            port = parts[3]
+            port = CleanPort(parts[3])
             print("La MAC address " + MAC_cible + " (Status: " + status + ") est en local sur le switch : " + getSwitchPrompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
         else:
             IsLocal(linebis)
