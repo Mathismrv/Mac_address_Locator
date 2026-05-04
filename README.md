@@ -89,12 +89,15 @@ Fonction qui permet une meilleur lisibilite dans le terminal de ExtremeCLound
 
 ### `main()`
 La fonction `main()` contient toute la logique pour localiser l'address MAC, voici les grosses etapes du main: 
-- Elle recupere l'entrée de l'utilisateur la nettois et interroge un switch pour savoir s'il la connait 
+- Elle recupere l'entrée de l'utilisateur la nettois
+- Entre dans une boucle puis interroge le switch choisi au debut pour savoir s'il la connait 
 - Ensuite on recupere la ligne ou notre Mac a été trouvée et on regarde si un tunnel existe
 - On verifie si la MAC n'est pas deja en local sur le premier switch interrogé
-- Sinon si un tunnel existe ou doit se connecter au switch que le tunnel affiche
+- Si oui, on sort de la boucle
+- Sinon on doit se connecter au switch que le tunnel affiche
 - On recupere donc l'IP de ce switch via son nom recuperé par le tunnel
-- On se connecte a celui-ci et on l'interroge 
-- On verifie que notre MAC est bien en local 
+- On se connecte a celui-ci et on boucle 
+- FIN de boucle :
+- On verifie que notre MAC est bien en local
 - Sinon, alors notre MAC n'est pas sur ce switch, il y a une erreur
 - Si elle est en local, c'est fini, on affiche nos resultats (IP du switch, le port, et l'adresse MAC)
