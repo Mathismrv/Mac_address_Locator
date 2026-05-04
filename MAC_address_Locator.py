@@ -291,5 +291,6 @@ def main():
     else:
         Win = IsLocal(nouveau_resultat)
         #on verifie si la mac address est en local ou pas sur ce switch
-    print(Jump)
+    print("Nombre de saut effectue :" + str(Jump))
+
 main()
