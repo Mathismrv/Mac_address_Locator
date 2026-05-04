@@ -285,7 +285,7 @@ def main():
         status = parts[1]
         port = CleanPort(parts[3])
         Betterprint("La MAC address " + MAC_cible + " (Status: " + status + ") est en local sur le switch : " + getSwitchPrompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
-
+        return
     if UserInputDebug :
         print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
     else:
