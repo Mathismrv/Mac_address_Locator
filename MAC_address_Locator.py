@@ -47,7 +47,7 @@ def AskDebug():
     UserInputDebug =emc_vars['userInputDebug']
     if UserInputDebug=="Enable":
         return True
-    elif UserInputdebug =="Disable" :
+    elif UserInputDebug =="Disable" :
         return False
 
 def ParseMacTableResponse(raw_response, mac_address):
@@ -218,13 +218,12 @@ def main():
         return
 
     result = ParseMacTableResponse(raw_response, MAC_cible)
-    if UserInputDebug :
-        print("Resultat de la ligne ou la MAC a ete trouve : "+result)
-
     #On verifie que la ligne est trouvée sinon on affiche un message d'erreur
     if result == None:
         print("MAC address pas trouvee dans la table MAC du switch " + emc_vars['deviceName'])
         return
+    if UserInputDebug :
+        print("Resultat de la ligne ou la MAC a ete trouve : "+result)
 
     tunnel_info = getTunnel(result)
     #si on a pas d'erreur alors on recupere le tunnel associé à la ligne de la table MAC ou est trouvée notre adresse MAC cible
