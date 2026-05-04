@@ -215,7 +215,6 @@ def main():
     JumpLimit=5
     Jump =0
     while Jump < JumpLimit :
-        Jump+=1
         command = "show vlan mac-address-entry mac " + MAC_cible
         raw_response = ExecuteCLICommand(command)
         #On demande au switch de nous afficher la ligne de la table MAC ou est trouvée notre adresse MAC cible
@@ -226,7 +225,7 @@ def main():
         result = ParseMacTableResponse(raw_response, MAC_cible)
         #On verifie que la ligne est trouvée sinon on affiche un message d'erreur
         if result == None:
-            print("MAC address pas trouvee dans la table MAC du switch " + emc_vars['deviceName'])
+            print("MAC address pas trouvee dans la table MAC du switch actuel")
             break
         if UserInputDebug :
             print("Resultat de la ligne ou la MAC a ete trouve : "+result)
@@ -237,25 +236,7 @@ def main():
         if (UserInputDebug) :
             print("Info du tunnel trouve : "+ tunnel_info)
         if tunnel_info =="LOCAL":
-            Commandbis= "sh i-sid mac-address-entry mac "+ MAC_cible
-            results = ExecuteCLICommand(Commandbis)
-            linebis = ParseMacTableResponse(results, MAC_cible)
-            if UserInputDebug :
-                print("Ligne ou a ete trouve la MAC : "+linebis)
-            if linebis is None:
-                parts = result.split()
-                status = parts[1]
-                port = CleanPort(parts[3])
-                print("La MAC address " + MAC_cible + " (Status: " + status + ") est en local sur le switch : " + getSwitchPrompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
-                found=True
-            else:
-                Win = IsLocal(linebis)
-                if Win ==1 :
-                    break
-                else:
-                    break
-
-
+            break
         raw_query = '''
             query {
                 network {
@@ -288,28 +269,27 @@ def main():
                 #on defini l'IP du Switch qu'on veut interroger
                 emc_cli.connect()
                 #on se connecte a celui-ci
-                NewCommand= "sh i-sid mac-address-entry mac "+ MAC_cible
-                #On execute une nouvelle commande qui affiche si les addresses MAC sont en local
-                # ou pas sur ce switch et sur quel port
-                nouvelle_reponse_brute = ExecuteCLICommand(NewCommand)
-                #on recupere la reponse brute de la commande
-                nouveau_resultat = ParseMacTableResponse(nouvelle_reponse_brute, MAC_cible)
-                #on verifie que la ligne est trouvée
-                if nouveau_resultat == None:
-                    Betterprint("La MAC address n'a pas ete trouvee dans la table MAC du switch " + emc_vars['deviceName'])
-                    break
-                if UserInputDebug :
-                    print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
-                else:
-                    Win = IsLocal(nouveau_resultat)
-                    #on verifie si la mac address est en local ou pas sur ce switch, si oui on coupe la boucle sinon on continue
-                    if Win == 1 :
-                        break
-                    elif Win == 0 :
-                        continue
+                Jump+=1
         else:
             print("La reponse GraphQL est vide")
-            return
+            break
+    NewCommand= "sh i-sid mac-address-entry mac "+ MAC_cible
+    #On execute une nouvelle commande qui affiche si les addresses MAC sont en local
+    # ou pas sur ce switch et sur quel port
+    nouvelle_reponse_brute = ExecuteCLICommand(NewCommand)
+    #on recupere la reponse brute de la commande
+    nouveau_resultat = ParseMacTableResponse(nouvelle_reponse_brute, MAC_cible)
+    #on verifie que la ligne est trouvée
+    if nouveau_resultat == None:
+        parts = result.split()
+        status = parts[1]
+        port = CleanPort(parts[3])
+        Betterprint("La MAC address " + MAC_cible + " (Status: " + status + ") est en local sur le switch : " + getSwitchPrompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
+
+    if UserInputDebug :
+        print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
+    else:
+        Win = IsLocal(nouveau_resultat)
+        #on verifie si la mac address est en local ou pas sur ce switch
     print(Jump)
-    return
 main()
