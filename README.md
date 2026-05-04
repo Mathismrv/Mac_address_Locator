@@ -4,9 +4,9 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 
 ## Installation
 1. Télécharger XIQSE-SDK de Thibault Chevalleraud sur son GitHub : [www.github.com/TChevalleraud/XIQSE-SDK-Python]
-2. Exécuter les commandes données dans le README de Thibault pour installer le SDK et ses dépendances.
+2. Exécuter les commandes données dans le README de Thibault pour installer le SDK et ses dépendances, il faut que le script est accés au fonction de Thibault.
 3. Télécharger le projet MAC_address_Locator sur votre machine.
-4. Ajouter à vos scripts dans ExtremeCloudIQ le script `MAC_address_Locator.py` (dans l'onglet Task).
+4. Ajouter à vos scripts dans ExtremeCloudIQ le script `MAC_address_Locator.py` (dans l'onglet Task+le bouton "Add+",), vous devez donné les droits necessaires pour que le script puisse executer des commandes CLI et GraphQL.
 5. Exécuter le script sur un switch au hasard.
 6. Rentrer l'adresse MAC que vous voulez localiser dans la fabric.
 7. Le script va vous retourner le nom du switch et le port où est connectée votre adresse MAC cible.
@@ -68,15 +68,33 @@ Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans
 - **param mac_address** : Notre MAC address cible.
 - **return** : retourne la ligne où est trouvée l'adresse MAC.
 
-### 'EntryToCorrectFormat(UserInput)'
-Cette fonction permet de mettre sous format une addresse MAC donnée de la forme : "00:11:22:33:44:55", "00-11-22-33-44-55", "0011.2233.4455", "001122334455" et la variantes avec espaces, et la traduit sous forme "XX:XX:XX:XX:XX:XX"
--**param UserInput**: L'adresse MAC entrée par l'utilisateur
--**return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
+### `EntryToCorrectFormat(UserInput)`
+Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne recuperant que les characteres qui ressemble a de l'hexadecimal et reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX"
+- **param UserInput**: L'adresse MAC entrée par l'utilisateur
+- **return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
 
-### 'CleanPort(port)'
+### `CleanPort(port)`
 Fonction qui sert a nettoyer la sortie du port pour n'afficher que le port 
 - **param port**: port a nettoyé
 - **return**: port tout propre
 
+### `AskDebug()`
+Regarde si l'utilisateur veut un debug 
+- **return**: retourne True ou False en fonction de ce que veut l'utilisateur
+
+### `Betterprint(String):`
+Fonction qui permet une meilleur lisibilite dans le terminal de ExtremeCLound
+- **param String**: une chaine de charactere qui va etre rendu plus lisible 
+
+
 ### `main()`
-Fonction principale du script qui coordonne les actions (appels CLI, requêtes GraphQL, changements de switch) pour localiser la MAC cible.
+La fonction `main()` contient toute la logique pour localiser l'address MAC, voici les grosses etapes du main: 
+- Elle recupere l'entrée de l'utilisateur la nettois et interroge un switch pour savoir s'il la connait 
+- Ensuite on recupere la ligne ou notre Mac a été trouvée et on regarde si un tunnel existe
+- On verifie si la MAC n'est pas deja en local sur le premier switch interrogé
+- Sinon si un tunnel existe ou doit se connecter au switch que le tunnel affiche
+- On recupere donc l'IP de ce switch via son nom recuperé par le tunnel
+- On se connecte a celui-ci et on l'interroge 
+- On verifie que notre MAC est bien en local 
+- Sinon, alors notre MAC n'est pas sur ce switch, il y a une erreur
+- Si elle est en local, c'est fini, on affiche nos resultats (IP du switch, le port, et l'adresse MAC)

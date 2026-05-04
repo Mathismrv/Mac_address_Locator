@@ -16,13 +16,14 @@
 #        type = string,
 #        required = no,
 #        validValues = [Enable, Disable],
-#        name = userInput_debug,
+#        name = userInputDebug,
 #    )#@SectionEnd
 #@MetaDataEnd
 '''
 
 import sys
 import re
+RESET="\033[0m"
 # Initialisation du framework XIQSE de Thibault Chevalleraud
 from XIQSE import XIQSE
 ctx = XIQSE(emc_cli, emc_nbi, emc_results, emc_vars)
@@ -38,6 +39,16 @@ def ExecuteCLICommand(command):
     output = ctx.CLI.sendCommandShow(command)
     return output
 
+def AskDebug():
+    '''
+    Regarde si l'utilisateur veut un debug
+    :return: retourne True ou False en fonction de ce que veut l'utilisateur
+    '''
+    UserInputDebug =emc_vars['userInputDebug']
+    if UserInputDebug=="Enable":
+        return True
+    elif UserInputdebug =="Disable" :
+        return False
 
 def ParseMacTableResponse(raw_response, mac_address):
     '''
@@ -118,10 +129,10 @@ def IsLocal(line) :
     parts = line.split()
     try:
         if parts[4] == "NON-LOCAL":
-            print("La mac address n est pas en local sur ce switch")
+            Betterprint("La mac address n est pas en local sur ce switch")
             return 0
         if parts[4] == "LOCAL":
-            print("Gagne, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et sur le port: " + CleanPort(parts[3]))
+            Betterprint("Gagne, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et sur le port: " + CleanPort(parts[3]))
             return 1
     except IndexError:
         print("Format inattendu pour la ligne: " + line)
@@ -177,13 +188,29 @@ def EntryToCorrectFormat(UserInput):
     print("Erreur: entrée MAC invalide '{UserInput}' ")
     return UserInput
 
+def Betterprint(String):
+    '''
+    Fonction qui permet une meilleur lisibilite dans le terminal de ExtremeCLound
+    :param String: une chaine de charactere qui va etre rendu plus lisible
+    '''
+    print("="*100 )
+    print(String)
+    print("="*100)
+
 
 def main():
+    UserInputDebug=AskDebug()
     MAC_cible = emc_vars['userInput_MAC_Address']
+    if UserInputDebug :
+        print("Mac a chercher : " +MAC_cible)
     MAC_cible=EntryToCorrectFormat(MAC_cible)
+    print("="*100)
+    print("RESULTAT TOUT EN BAS DU TERMINAL")
+    print("="*100)
 
     command = "show vlan mac-address-entry mac " + MAC_cible
-
+    if UserInputDebug :
+        print("Commande CLI : "+ command)
     raw_response = ExecuteCLICommand(command)
     #On demande au switch de nous afficher la ligne de la table MAC ou est trouvée notre adresse MAC cible
     if raw_response is None or "error" in raw_response.lower():
@@ -191,6 +218,9 @@ def main():
         return
 
     result = ParseMacTableResponse(raw_response, MAC_cible)
+    if UserInputDebug :
+        print("Resultat de la ligne ou la MAC a ete trouve : "+result)
+
     #On verifie que la ligne est trouvée sinon on affiche un message d'erreur
     if result == None:
         print("MAC address pas trouvee dans la table MAC du switch " + emc_vars['deviceName'])
@@ -199,10 +229,14 @@ def main():
     tunnel_info = getTunnel(result)
     #si on a pas d'erreur alors on recupere le tunnel associé à la ligne de la table MAC ou est trouvée notre adresse MAC cible
     #si la adresse est vu en local on affiche un message de succes
+    if (UserInputDebug) :
+        print("Info du tunnel trouve : "+ tunnel_info)
     if tunnel_info =="LOCAL":
         Commandbis= "sh i-sid mac-address-entry mac "+ MAC_cible
         results = ExecuteCLICommand(Commandbis)
         linebis = ParseMacTableResponse(results, MAC_cible)
+        if UserInputDebug :
+            print("Ligne ou a ete trouve la MAC : "+linebis)
         if linebis is None:
             parts = result.split()
             status = parts[1]
@@ -224,16 +258,18 @@ def main():
     '''
     #requete GraphQL pour recupere la liste des IP de tous les switchs dans la fabric avec leur sysName pour recupere celui qui nous interesse
 
-    graphql_response = ExecuteGraphQL(raw_query)
+    GraphQL_Response = ExecuteGraphQL(raw_query)
     #on execute notre commande
 
-    if graphql_response:
-        switch_ip = getSwitchIP(graphql_response, tunnel_info)
+    if GraphQL_Response:
+        switch_ip = getSwitchIP(GraphQL_Response, tunnel_info)
         #on recupere l'IP du switch via son sysName (qui est dans tunnel_info)
+        if UserInputDebug :
+            print("L'ip du switch trouve est : "+ switch_ip)
         if switch_ip==None:
             print("Impossible de recuperer l'IP du switch " + str(tunnel_info) + " depuis la reponse GraphQL")
             return
-            #si la fonction retourne une erreur on verifie et on l'affiche
+            #si la fonction ne retourne rien on verifie et on l'affiche une erreur
         else:
             print("Connection au switch: " + switch_ip)
             ctx.close()
@@ -249,9 +285,14 @@ def main():
             #on recupere la reponse brute de la commande
             nouveau_resultat = ParseMacTableResponse(nouvelle_reponse_brute, MAC_cible)
             #on verifie que la ligne est trouvée
+            if UserInputDebug :
+                print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
             if nouveau_resultat == None:
-                print("La MAC address n'a pas ete trouvee dans la table MAC du switch " + emc_vars['deviceName'])
+                Betterprint("La MAC address n'a pas ete trouvee dans la table MAC du switch " + emc_vars['deviceName'])
             else:
                 IsLocal(nouveau_resultat)
+                return
                 #on verifie si la mac address est en local ou pas sur ce switch et on affiche le resultat
+    else:
+        print("La reponse GraphQL est vide")
 main()
