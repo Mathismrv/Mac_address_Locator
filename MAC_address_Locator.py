@@ -185,8 +185,8 @@ def EntryToCorrectFormat(UserInput):
     hexchars = re.sub(r'[^0-9a-f]', '', s)
     if len(hexchars) == 12:
         return ':'.join(hexchars[i:i+2]for i in range(0, len(hexchars),2))
-    print("Erreur: entrée MAC invalide '{UserInput}' ")
-    return UserInput
+    print("Erreur: entree MAC invalide "+ UserInput +". Format attendu soit comporter 12 characteres hexa.")
+    return None
 
 def Betterprint(String):
     '''
@@ -204,6 +204,8 @@ def main():
     if UserInputDebug :
         print("Mac a chercher : " +MAC_cible)
     MAC_cible=EntryToCorrectFormat(MAC_cible)
+    if MAC_cible==None: return
+
     print("="*100)
     print("RESULTAT TOUT EN BAS DU TERMINAL")
     print("="*100)
@@ -241,6 +243,7 @@ def main():
             status = parts[1]
             port = CleanPort(parts[3])
             print("La MAC address " + MAC_cible + " (Status: " + status + ") est en local sur le switch : " + getSwitchPrompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
+            return
         else:
             IsLocal(linebis)
         return
@@ -288,10 +291,12 @@ def main():
                 print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
             if nouveau_resultat == None:
                 Betterprint("La MAC address n'a pas ete trouvee dans la table MAC du switch " + emc_vars['deviceName'])
+                return
             else:
                 IsLocal(nouveau_resultat)
                 return
                 #on verifie si la mac address est en local ou pas sur ce switch et on affiche le resultat
     else:
         print("La reponse GraphQL est vide")
+        return
 main()
