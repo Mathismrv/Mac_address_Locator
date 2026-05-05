@@ -131,7 +131,7 @@ def IsLocal(line) :
             Betterprint("La mac address n est pas en local sur ce switch")
             return 0
         if parts[4] == "LOCAL":
-            Betterprint("Gagne, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et sur le port: " + CleanPort(parts[3]))
+            Betterprint("Trouvee, la MAC address : "+ parts[2] +" est en local sur le switch : "+getSwitchPrompt()+ ", et connecte sur le port: " + CleanPort(parts[3]))
             return 1
     except IndexError:
         print("Format inattendu pour la ligne: " + line)

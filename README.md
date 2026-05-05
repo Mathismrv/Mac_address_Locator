@@ -3,14 +3,37 @@ Ce script a pour but de localiser une adresse MAC dans une fabric ExtremeCloudIQ
 Le script interroge les tables MAC des switchs de la fabric pour trouver une adresse MAC cible et retourne le nom du switch et le port où elle est connectée.
 
 ## Installation
+
+### Étape 1 : Télécharger le SDK
 1. Rendez-vous sur le projet XIQSE-SDK de Thibault Chevalleraud sur son GitHub : [www.github.com/TChevalleraud/XIQSE-SDK-Python]
-2. Exécuter les commandes données dans le README de Thibault pour installer le SDK et ses dépendances, il faut que le script est accès aux fonctions de Thibault,
-pour cela vous devez exécuter les commandes sur la VM, où est hébergée SITE Engine, avec des droits d'accès pour créer un dossier dans le dossier Extreme_Networks.
-3. Télécharger le projet MAC_address_Locator sur votre machine.
-4. Ajouter à vos scripts dans ExtremeCloudIQ le script `MAC_address_Locator.py` (dans l'onglet Task+le bouton "Add+",), vous devez donné les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL.
-5. Exécuter le script sur un switch au hasard.
-6. Rentrer l'adresse MAC que vous voulez localiser dans la fabric.
-7. Le script va vous retourner le nom du switch et le port où est connectée votre adresse MAC cible.
+2. Exécutez les commandes données dans le README de Thibault dans un terminal pour installer le SDK et ses dépendances. Assurez-vous que le script a accès aux fonctions de Thibault. Pour cela, vous devez exécuter les commandes sur la VM où est hébergé SITE Engine, avec des droits d'accès pour créer un dossier dans le dossier Extreme_Networks.
+
+### Étape 2 : Télécharger le projet
+3. Téléchargez ou copiez le projet MAC_address_Locator.
+
+### Étape 3 : Ajouter le script à ExtremeCloudIQ
+4. Ajoutez le script `MAC_address_Locator.py` à vos scripts dans ExtremeCloudIQ en copiant ou en important le fichier. Pour cela, utilisez l'onglet "Task" et le bouton "Add" comme illustré ci-dessous :
+
+   ![Task](Images/0.png) ![Add](Images/1.png) ![Ajouter](Images/3.png)
+
+5. Assurez-vous de donner les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL :
+
+   ![Droits](Images/2.png)
+
+### Étape 4 : Exécuter le script
+6. Exécutez le script en le sélectionnant et en cliquant sur "Run" :
+
+   ![Exécuter](Images/5.png)
+
+### Étape 5 : Entrer l'adresse MAC
+7. Choississez un switch de départ et entrez l'adresse MAC que vous souhaitez localiser.
+    
+    ![Entrée](Images/5,5.png) ![MAC](Images/6.png)
+
+### Étape 6 : Résultat
+8. Le script vous retournera le nom du switch et le port où est connectée votre adresse MAC cible.
+
+    ![Résultat](Images/Resultat.png)
 
 ## Fonctions
 
