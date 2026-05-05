@@ -37,20 +37,20 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 
 ## Fonctions
 
-### `IsLocal(line)`
+### `is_local(line)`
 Cette fonction vérifie si la ligne rentrée contient le mot "LOCAL" ou "NON-LOCAL" pour déterminer si l'adresse MAC est en local sur le switch ou pas.
 - **param line** : ligne de la table MAC où est trouvée notre adresse MAC cible.
 - **return** : retourne 0 ou 1 et un message pour indiquer si la MAC est locale ou non.
 
-### `ExecuteCLICommand(command)`
+### `execute_cli_command(command)`
 Exécute une commande CLI simple et retourne la réponse brute.
 **Exemple :**
 ```python
 command = "enable"
-ExecuteCLICommand(command)
+execute_cli_command(command)
 ```
 
-### `ExecuteGraphQL(query_string)`
+### `execute_graphql(query_string)`
 Exécute une requête GraphQL brute et retourne la réponse.
 - **param query_string** : Requête GraphQL sous forme de string.
 - **return** : Réponse de la requête GraphQL.
@@ -67,46 +67,46 @@ raw_query = '''
         }
     }
 '''
-raw_response = ExecuteGraphQL(raw_query)
+raw_response = execute_graphql(raw_query)
 print("GraphQL response: " + str(raw_response))
 ```
 
-### `getSwitchIP(GraphQl_response, Switch_Name)`
+### `get_switch_ip(GraphQl_response, Switch_Name)`
 Cette fonction sert à extraire l'IP du switch à partir de la réponse GraphQL en fonction du nom du switch.
 - **param GraphQl_response** : Réponse GraphQL sous forme de dictionnaire/liste.
 - **param Switch_Name** : Nom du switch.
 - **return** : IP du switch ou message d'erreur si le switch n'est pas trouvé.
 
-### `getTunnel(line)`
+### `get_tunnel(line)`
 La fonction permet de récupérer le tunnel associé à la ligne de la table MAC où est trouvée notre adresse MAC cible. Et vérifie si l'adresse MAC est en local sur le premier switch interrogé.
 - **param line** : ligne de la table MAC où est trouvée notre adresse MAC cible.
 - **return** : Le nom du switch de la colonne tunnel ou bien, si la MAC est locale, on renvoi le nom du switch + le port.
 
-### `getSwitchPrompt()`
-Cette fonction n'exécute aucune commande pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `IsLocal()`.
+### `get_switch_prompt()`
+Cette fonction n'exécute aucune commande pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `is_local()`.
 - **return** : Le prompt du switch.
 
-### `ParseMacTableResponse(raw_response, mac_address)`
+### `parse_mac_table_response(raw_response, mac_address)`
 Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans la réponse brute de la commande CLI.
 - **param raw_response** : Réponse brute de la commande CLI.
 - **param mac_address** : Notre MAC address cible.
 - **return** : retourne la ligne où est trouvée l'adresse MAC.
 
-### `EntryToCorrectFormat(UserInput)`
+### `entry_to_correct_format(UserInput)`
 Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne récupérant que les caractères qui ressemble à de l'hexadécimal et reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX"
 - **param UserInput**: L'adresse MAC entrée par l'utilisateur
 - **return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
 
-### `CleanPort(port)`
+### `clean_port(port)`
 Fonction qui sert à nettoyer la sortie du port pour n'afficher que le port
 - **param port**: port à nettoyer
 - **return**: port tout propre
 
-### `AskDebug()`
+### `ask_debug()`
 Regarde si l'utilisateur veut un debug
 - **return**: retourne True ou False en fonction de ce que veut l'utilisateur
 
-### `Betterprint(String):`
+### `better_print(String):`
 Fonction qui permet une meilleure lisibilité dans le terminal de ExtremeCloud
 - **param String**: une chaîne de caractère qui va être rendu plus lisible
 
@@ -123,5 +123,5 @@ La fonction `main()` contient toute la logique pour localiser l'adresse MAC, voi
 - On se connecte à celui-ci et on boucle
 - FIN de boucle :
 - On vérifie que notre MAC est bien en local
-- Sinon, alors notre MAC n'est pas sur ce switch, il y a une erreur
+- Sinon, alors notre MAC n'est pas sur ce switch, le scipt affiche une erreur et s'arrête
 - Si elle est en local, c'est fini, on affiche nos résultats (IP du switch, le port, et l'adresse MAC)
