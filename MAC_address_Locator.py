@@ -287,9 +287,8 @@ def main():
         return
     if UserInputDebug :
         print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
-    else:
-        IsLocal(nouveau_resultat)
-        #on verifie si la mac address est en local ou pas sur ce switch
+    IsLocal(nouveau_resultat)
+    #on verifie si la mac address est en local ou pas sur ce switch
     print("Nombre de saut effectue :" + str(Jump))
 
 main()
