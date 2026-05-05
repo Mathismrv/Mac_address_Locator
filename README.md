@@ -123,5 +123,5 @@ La fonction `main()` contient toute la logique pour localiser l'adresse MAC, voi
 - On se connecte à celui-ci et on boucle
 - FIN de boucle :
 - On vérifie que notre MAC est bien en local
-- Sinon, alors notre MAC n'est pas sur ce switch, le scipt affiche une erreur et s'arrête
+- Sinon, alors notre MAC n'est pas sur ce switch, le script affiche une erreur et s'arrête
 - Si elle est en local, c'est fini, on affiche nos résultats (IP du switch, le port, et l'adresse MAC)
