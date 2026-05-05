@@ -219,14 +219,14 @@ def main():
         raw_response = ExecuteCLICommand(command)
         #On demande au switch de nous afficher la ligne de la table MAC ou est trouvée notre adresse MAC cible
         if raw_response is None or "error" in raw_response.lower():
-            print("Pas de reponse ou erreur lors de l execution de la commande CLI: " + str(raw_response))
-            break
+            Betterprint("Pas de reponse ou erreur lors de l execution de la commande CLI: " + str(raw_response))
+            return
 
         result = ParseMacTableResponse(raw_response, MAC_cible)
         #On verifie que la ligne est trouvée sinon on affiche un message d'erreur
         if result == None:
-            print("MAC address pas trouvee dans la table MAC du switch actuel")
-            break
+            Betterprint("MAC address pas trouvee dans la table MAC du switch actuel")
+            return
         if UserInputDebug :
             print("Resultat de la ligne ou la MAC a ete trouve : "+result)
 
@@ -258,8 +258,8 @@ def main():
             if UserInputDebug :
                 print("L'ip du switch trouve est : "+ switch_ip)
             if switch_ip==None:
-                print("Impossible de recuperer l'IP du switch " + str(tunnel_info) + " depuis la reponse GraphQL")
-                break
+                Betterprint("Impossible de recuperer l'IP du switch " + str(tunnel_info) + " depuis la reponse GraphQL")
+                return
                 #si la fonction ne retourne rien on verifie et on l'affiche une erreur
             else:
                 print("Connection au switch: " + switch_ip)
@@ -271,8 +271,8 @@ def main():
                 #on se connecte a celui-ci
                 Jump+=1
         else:
-            print("La reponse GraphQL est vide")
-            break
+            Betterprint("La reponse GraphQL est vide")
+            return
     NewCommand= "sh i-sid mac-address-entry mac "+ MAC_cible
     #On execute une nouvelle commande qui affiche si les addresses MAC sont en local
     # ou pas sur ce switch et sur quel port
@@ -289,7 +289,7 @@ def main():
     if UserInputDebug :
         print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
     else:
-        Win = IsLocal(nouveau_resultat)
+        IsLocal(nouveau_resultat)
         #on verifie si la mac address est en local ou pas sur ce switch
     print("Nombre de saut effectue :" + str(Jump))
 
