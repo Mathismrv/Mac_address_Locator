@@ -1,12 +1,13 @@
 # MAC_address_Locator
-Ce script a pour but de localiser une adresse MAC dans une fabric ExtremeCloudIQ en utilisant le SDK Python de Thibault Chevalleraud. 
+Ce script a pour but de localiser une adresse MAC dans une fabric ExtremeCloudIQ en utilisant le SDK Python de Thibault Chevalleraud.
 Le script interroge les tables MAC des switchs de la fabric pour trouver une adresse MAC cible et retourne le nom du switch et le port où elle est connectée.
 
 ## Installation
-1. Télécharger XIQSE-SDK de Thibault Chevalleraud sur son GitHub : [www.github.com/TChevalleraud/XIQSE-SDK-Python]
-2. Exécuter les commandes données dans le README de Thibault pour installer le SDK et ses dépendances, il faut que le script est accés au fonction de Thibault.
+1. Rendez-vous sur le projet XIQSE-SDK de Thibault Chevalleraud sur son GitHub : [www.github.com/TChevalleraud/XIQSE-SDK-Python]
+2. Exécuter les commandes données dans le README de Thibault pour installer le SDK et ses dépendances, il faut que le script est accès aux fonctions de Thibault,
+pour cela vous devez exécuter les commandes sur la VM, où est hébergée SITE Engine, avec des droits d'accès pour créer un dossier dans le dossier Extreme_Networks.
 3. Télécharger le projet MAC_address_Locator sur votre machine.
-4. Ajouter à vos scripts dans ExtremeCloudIQ le script `MAC_address_Locator.py` (dans l'onglet Task+le bouton "Add+",), vous devez donné les droits necessaires pour que le script puisse executer des commandes CLI et GraphQL.
+4. Ajouter à vos scripts dans ExtremeCloudIQ le script `MAC_address_Locator.py` (dans l'onglet Task+le bouton "Add+",), vous devez donné les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL.
 5. Exécuter le script sur un switch au hasard.
 6. Rentrer l'adresse MAC que vous voulez localiser dans la fabric.
 7. Le script va vous retourner le nom du switch et le port où est connectée votre adresse MAC cible.
@@ -23,7 +24,7 @@ Exécute une commande CLI simple et retourne la réponse brute.
 **Exemple :**
 ```python
 command = "enable"
-print(ExecuteCLICommand(command))
+ExecuteCLICommand(command)
 ```
 
 ### `ExecuteGraphQL(query_string)`
@@ -56,10 +57,10 @@ Cette fonction sert à extraire l'IP du switch à partir de la réponse GraphQL 
 ### `getTunnel(line)`
 La fonction permet de récupérer le tunnel associé à la ligne de la table MAC où est trouvée notre adresse MAC cible. Et vérifie si l'adresse MAC est en local sur le premier switch interrogé.
 - **param line** : ligne de la table MAC où est trouvée notre adresse MAC cible.
-- **return** : Le nom du switch de la colonne tunnel ou bien, si la MAC est locale, on renvoie le nom du switch + le port.
+- **return** : Le nom du switch de la colonne tunnel ou bien, si la MAC est locale, on renvoi le nom du switch + le port.
 
 ### `getSwitchPrompt()`
-Cette fonction n'envoie rien pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `IsLocal()`.
+Cette fonction n'exécute aucune commande pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `IsLocal()`.
 - **return** : Le prompt du switch.
 
 ### `ParseMacTableResponse(raw_response, mac_address)`
@@ -69,35 +70,35 @@ Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans
 - **return** : retourne la ligne où est trouvée l'adresse MAC.
 
 ### `EntryToCorrectFormat(UserInput)`
-Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne recuperant que les characteres qui ressemble a de l'hexadecimal et reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX"
+Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne récupérant que les caractères qui ressemble à de l'hexadécimal et reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX"
 - **param UserInput**: L'adresse MAC entrée par l'utilisateur
 - **return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
 
 ### `CleanPort(port)`
-Fonction qui sert a nettoyer la sortie du port pour n'afficher que le port 
-- **param port**: port a nettoyé
+Fonction qui sert à nettoyer la sortie du port pour n'afficher que le port
+- **param port**: port à nettoyer
 - **return**: port tout propre
 
 ### `AskDebug()`
-Regarde si l'utilisateur veut un debug 
+Regarde si l'utilisateur veut un debug
 - **return**: retourne True ou False en fonction de ce que veut l'utilisateur
 
 ### `Betterprint(String):`
-Fonction qui permet une meilleur lisibilite dans le terminal de ExtremeCLound
-- **param String**: une chaine de charactere qui va etre rendu plus lisible 
+Fonction qui permet une meilleure lisibilité dans le terminal de ExtremeCloud
+- **param String**: une chaîne de caractère qui va être rendu plus lisible
 
 
 ### `main()`
-La fonction `main()` contient toute la logique pour localiser l'address MAC, voici les grosses etapes du main: 
-- Elle recupere l'entrée de l'utilisateur la nettois
-- Entre dans une boucle puis interroge le switch choisi au debut pour savoir s'il la connait 
-- Ensuite on recupere la ligne ou notre Mac a été trouvée et on regarde si un tunnel existe
-- On verifie si la MAC n'est pas deja en local sur le premier switch interrogé
+La fonction `main()` contient toute la logique pour localiser l'adresse MAC, voici les grosses étapes du main:
+- Elle récupère l'entrée de l'utilisateur la nettoie
+- Entre dans une boucle puis interroge le switch choisi au début pour savoir s'il la connaît
+- Ensuite on récupère la ligne où notre Mac a été trouvée et on regarde si un tunnel existe
+- On vérifie si la MAC n'est pas déjà en local sur le premier switch interrogé
 - Si oui, on sort de la boucle
 - Sinon on doit se connecter au switch que le tunnel affiche
-- On recupere donc l'IP de ce switch via son nom recuperé par le tunnel
-- On se connecte a celui-ci et on boucle 
+- On récupère donc l'IP de ce switch via son nom récupéré par le tunnel
+- On se connecte à celui-ci et on boucle
 - FIN de boucle :
-- On verifie que notre MAC est bien en local
+- On vérifie que notre MAC est bien en local
 - Sinon, alors notre MAC n'est pas sur ce switch, il y a une erreur
-- Si elle est en local, c'est fini, on affiche nos resultats (IP du switch, le port, et l'adresse MAC)
+- Si elle est en local, c'est fini, on affiche nos résultats (IP du switch, le port, et l'adresse MAC)

@@ -23,7 +23,6 @@
 
 import sys
 import re
-RESET="\033[0m"
 # Initialisation du framework XIQSE de Thibault Chevalleraud
 from XIQSE import XIQSE
 ctx = XIQSE(emc_cli, emc_nbi, emc_results, emc_vars)
@@ -54,7 +53,7 @@ def ParseMacTableResponse(raw_response, mac_address):
     '''
     Cette fonction sert a verifier si l'adresse MAC recherchée
     est présente dans la réponse brute de la commande CLI.
-    :param raw_response: Reponse brute de la commande CLI
+    :param raw_response: Réponse brute de la commande CLI
     :param mac_address: Notre Mac address cible
     :return: retourne la ligne ou est trouvée la mac address
     '''
