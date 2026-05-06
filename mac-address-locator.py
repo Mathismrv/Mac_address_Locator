@@ -10,9 +10,15 @@
 #        required = yes,
 #        name = userInput_MAC_Address,
 #    )#@SectionEnd
+#    @VariableFieldLabel (
+#        description = Nombre de saut limite entre switch ,
+#        type = string,
+#        required = no,
+#        name = userInput_Jump_limit,
+#    )#@SectionEnd
 #@SectionStart (description = Debug)
 #    @VariableFieldLabel (
-#        description = Debug,
+#        description = Debug ,
 #        type = string,
 #        required = no,
 #        validValues = [Enable, Disable],
@@ -207,6 +213,10 @@ def main():
         better_print("DEBUG: " + debug_msg)
     mac_cible=entry_to_correct_format(mac_cible)
     if mac_cible is None: return
+    if user_input_debug :
+        debug_msg = "Mac a chercher : " + mac_cible
+        debug_messages.append(debug_msg)
+        better_print("DEBUG: " + debug_msg)
 
     print("="*100)
     print("RESULTAT TOUT EN BAS DU TERMINAL")
@@ -214,9 +224,12 @@ def main():
     print("="*100)
 
 
-    jump_limit=5
-    jump =0
-    while jump < jump_limit :
+    jump_limit = int(emc_vars['userInput_Jump_limit'])
+    if jump_limit is None or jump_limit<=0 :
+        jump_limit = 5
+    jump = 0
+    found_local = False  # Flag pour tracker si on a trouvé la MAC en local
+    while jump < jump_limit : #Boucle qui va boucler sur plusieurs switch jusqu'a trouver l'addresse mac en local sur un switch avec un valeur de saut limite defini
         command = "show vlan mac-address-entry mac " + mac_cible
         raw_response = execute_cli_command(command)
         #On demande au switch de nous afficher la ligne de la table MAC ou est trouvée notre adresse MAC cible
@@ -242,6 +255,7 @@ def main():
             debug_messages.append(debug_msg)
             better_print("DEBUG: " + debug_msg)
         if tunnel_info == "LOCAL" :
+            found_local = True  # On marque qu'on a trouvé la MAC en local
             break
         raw_query = '''
             query {
@@ -278,6 +292,15 @@ def main():
         else:
             better_print("La response GraphQL est vide")
             return
+
+    # Vérification si la boucle s'est arrêtée avant de trouver la MAC en local
+    if not found_local and jump >= jump_limit:
+        better_print("La limite de " + str(jump_limit) + " sauts a ete atteinte. Le nombre de saut est plus important que la limite donnée ou la MAC n'a pas ete trouvee.")
+        print("Nombre de saut effectue :" + str(jump))
+        if user_input_debug and debug_messages:
+            better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
+        return
+
     new_command= "sh i-sid mac-address-entry mac "+ mac_cible
     #On execute une nouvelle commande qui affiche si les addresses MAC sont en local
     # ou pas sur ce switch et sur quel port
@@ -302,3 +325,4 @@ def main():
     # Récapitulatif des debugs à la fin
     if user_input_debug and debug_messages:
         better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
+main()
