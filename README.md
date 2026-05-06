@@ -14,7 +14,7 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 ### Étape 3 : Ajouter le script à ExtremeCloudIQ
 4. Ajoutez le script `MAC_address_Locator.py` à vos scripts dans ExtremeCloudIQ en copiant ou en important le fichier. Pour cela, utilisez l'onglet "Task" et le bouton "Add" comme illustré ci-dessous :
 
-   ![Task](Images/0.png) ![Add](Images/1.png) ![Ajouter](Images/3.png)
+   ![Task](Images/0.png) ![Add](Images/2'.png) ![Ajouter](Images/3.png)
 
 5. Assurez-vous de donner les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL :
 
