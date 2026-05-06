@@ -199,9 +199,12 @@ def better_print(string):
 
 def main():
     user_input_debug=ask_debug()
+    debug_messages = []  # Liste pour collecter les messages de debug
     mac_cible = emc_vars['userInput_MAC_Address']
     if user_input_debug :
-        print("Mac a chercher : " +mac_cible)
+        debug_msg = "Mac a chercher : " + mac_cible
+        debug_messages.append(debug_msg)
+        better_print("DEBUG: " + debug_msg)
     mac_cible=entry_to_correct_format(mac_cible)
     if mac_cible is None: return
 
@@ -227,13 +230,17 @@ def main():
             better_print("MAC address pas trouvee dans la table MAC du switch actuel")
             return
         if user_input_debug :
-            print("Resultat de la ligne ou la MAC a ete trouve : "+result)
+            debug_msg = "Resultat de la ligne ou la MAC a ete trouve : " + result
+            debug_messages.append(debug_msg)
+            better_print("DEBUG: " + debug_msg)
 
         tunnel_info = get_tunnel(result)
         #si on a pas d'erreur alors on recupere le tunnel associé à la ligne de la table MAC ou est trouvée notre adresse MAC cible
         #si la adresse est vu en local on affiche un message de succes
         if (user_input_debug) :
-            print("Info du tunnel trouve : "+ tunnel_info)
+            debug_msg = "Info du tunnel trouve : " + tunnel_info
+            debug_messages.append(debug_msg)
+            better_print("DEBUG: " + debug_msg)
         if tunnel_info == "LOCAL" :
             break
         raw_query = '''
@@ -255,7 +262,9 @@ def main():
             switch_ip = get_switch_ip(graphql_response, tunnel_info)
             #on recupere l'IP du switch via son sysName (qui est dans tunnel_info)
             if user_input_debug :
-                print("L'ip du switch trouve est : " + switch_ip)
+                debug_msg = "L'ip du switch trouve est : " + str(switch_ip)
+                debug_messages.append(debug_msg)
+                better_print("DEBUG: " + debug_msg)
             if switch_ip is None:
                 better_print("Impossible de recuperer l'IP du switch " + str(tunnel_info) + " depuis la response GraphQL")
                 return
@@ -283,9 +292,13 @@ def main():
         better_print("La MAC address " + mac_cible + " (Status: " + status + ") est en local sur le switch : " + get_switch_prompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
         return
     if user_input_debug :
-        print("La MAC a ete trouve sur cette ligne : "+nouveau_resultat)
+        debug_msg = "La MAC a ete trouve sur cette ligne : " + nouveau_resultat
+        debug_messages.append(debug_msg)
+        better_print("DEBUG: " + debug_msg)
     is_local(nouveau_resultat)
     #on verifie si la mac address est en local ou pas sur ce switch
     print("Nombre de saut effectue :" + str(jump))
 
-main()
+    # Récapitulatif des debugs à la fin
+    if user_input_debug and debug_messages:
+        better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
