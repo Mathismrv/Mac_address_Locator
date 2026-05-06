@@ -26,9 +26,9 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
    ![Exécuter](Images/5.png)
 
 ### Étape 5 : Entrer l'adresse MAC
-7. Choississez un switch de départ et entrez l'adresse MAC que vous souhaitez localiser.
+7. Choississez un switch de départ et entrez l'adresse MAC que vous souhaitez localiser, le nombre de saut maximum (valeur par default 5) et le mode debug (non obligatoire).
     
-    ![Entrée](Images/5,5.png) ![MAC](Images/6.png)
+    ![Entrée](Images/5,5.png) ![MAC](Images/Enter_mac_etc.png)
 
 ### Étape 6 : Résultat
 8. Le script vous retournera le nom du switch et le port où est connectée votre adresse MAC cible.
