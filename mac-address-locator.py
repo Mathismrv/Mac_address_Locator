@@ -5,13 +5,13 @@
 #@DetailDescriptionEnd
 #@SectionStart (description = Mac address Locator)
 #    @VariableFieldLabel (
-#        description = Entrer l adresse MAC,
+#        description = MAC address,
 #        type = string,
 #        required = yes,
 #        name = userInput_MAC_Address,
 #    )#@SectionEnd
 #    @VariableFieldLabel (
-#        description = Saut Maximum entre switchs. Valeur par default 5 ,
+#        description = Maximum number of jumps. Default is 5,
 #        type = int,
 #        required = no,
 #        name = userInput_Jump_limit,
@@ -124,7 +124,7 @@ def get_switch_ip(graphql_response, switch_name):
                 return device['ip']
         return
     except KeyError as e:
-        print("KeyError lors de l extraction de l IP du switch: " + str(e))
+        print("KeyError when extracting the switch IP: " + str(e))
         return "Error: Key not found in GraphQL response"
 
 def is_local(line) :
@@ -136,13 +136,13 @@ def is_local(line) :
     parts = line.split()
     try:
         if parts[4] == "NON-LOCAL":
-            better_print("La mac address n est pas en local sur ce switch")
+            better_print("The MAC address is not local on the switch")
             return 0
         if parts[4] == "LOCAL":
-            better_print("Trouvee, la MAC address : "+ parts[2] +" est en local sur le switch : "+get_switch_prompt()+ ", et connecte sur le port: " + clean_port(parts[3]))
+            better_print("The MAC address : "+ parts[2] +" is local to the switch : "+get_switch_prompt()+ ", and connected to the port: " + clean_port(parts[3]))
             return 1
     except IndexError:
-        print("Format inattendu pour la ligne: " + line)
+        print("Unexpected line break : " + line)
         return -1
 
 
@@ -161,7 +161,7 @@ def get_switch_prompt():
             prompt = prompt.replace(":1>", "").strip()
             return prompt
 
-    return "prompt non trouve"
+    return "Prompt not found"
 
 def clean_port(port):
     '''
@@ -192,7 +192,7 @@ def entry_to_correct_format(user_input):
     hexchars = re.sub(r'[^0-9a-f]', '', s)
     if len(hexchars) == 12:
         return ':'.join(hexchars[i:i+2]for i in range(0, len(hexchars),2))
-    better_print("Erreur: entree MAC invalide "+ user_input +". Le format attendu doit comporter 12 characteres en hexadecimal.")
+    better_print("Error : Invalid MAC address "+ user_input +". The expected format must consist of 12 hexadecimal characters.")
     return None
 
 def better_print(string):
@@ -210,19 +210,19 @@ def main():
     debug_messages = []  # Liste pour collecter les messages de debug
     mac_cible = emc_vars['userInput_MAC_Address']
     if user_input_debug :
-        debug_msg = "Mac a chercher : " + mac_cible
+        debug_msg = "MAC address : " + mac_cible
         debug_messages.append(debug_msg)
         better_print("DEBUG: " + debug_msg)
     mac_cible=entry_to_correct_format(mac_cible)
     if mac_cible is None: return
     if user_input_debug :
-        debug_msg = "Mac a chercher : " + mac_cible
+        debug_msg = "MAC address : " + mac_cible
         debug_messages.append(debug_msg)
         better_print("DEBUG: " + debug_msg)
 
     print("="*100)
-    print("RESULTAT TOUT EN BAS DU TERMINAL")
-    print("Debut de la recherche :")
+    print("THE RESULTS IS AT THE BOTTOM OF THE TERMINAL")
+    print("Start search :")
     print("="*100)
 
     if emc_vars['userInput_Jump_limit'] is None :
@@ -238,16 +238,16 @@ def main():
         raw_response = execute_cli_command(command)
         #On demande au switch de nous afficher la ligne de la table MAC ou est trouvee notre adresse MAC cible
         if raw_response is None or "error" in raw_response.lower():
-            better_print("Pas de response ou erreur lors de l execution de la commande CLI: " + str(raw_response))
+            better_print("No response or an error when running the CLI command: " + str(raw_response))
             return
 
         result = parse_mac_table_response(raw_response, mac_cible)
         #On verifie que la ligne est trouvee sinon on affiche un message d erreur
         if result is None:
-            better_print("MAC address pas trouvee dans la table MAC du switch actuel")
+            better_print("MAC address not found in the MAC address table of the switch. The search is stopped.")
             return
         if user_input_debug :
-            debug_msg = "Resultat de la ligne ou la MAC a ete trouve : " + result
+            debug_msg = "MAC address was found in : " + result
             debug_messages.append(debug_msg)
             better_print("DEBUG: " + debug_msg)
 
@@ -255,7 +255,7 @@ def main():
         #si on a pas d erreur alors on recupere le tunnel associe a la ligne de la table MAC ou est trouvee notre adresse MAC cible
         #si la adresse est vu en local on affiche un message de succes
         if (user_input_debug) :
-            debug_msg = "Info du tunnel trouve : " + tunnel_info
+            debug_msg = "Tunnel details found: " + tunnel_info
             debug_messages.append(debug_msg)
             better_print("DEBUG: " + debug_msg)
         if tunnel_info == "LOCAL" :
@@ -280,29 +280,29 @@ def main():
             switch_ip = get_switch_ip(graphql_response, tunnel_info)
             #on recupere l IP du switch via son sysName (qui est dans tunnel_info)
             if user_input_debug :
-                debug_msg = "L ip du switch trouve est : " + str(switch_ip)
+                debug_msg = "Switch IP is : " + str(switch_ip)
                 debug_messages.append(debug_msg)
                 better_print("DEBUG: " + debug_msg)
             if switch_ip is None:
-                better_print("Impossible de recuperer l IP du switch " + str(tunnel_info) + " depuis la response GraphQL")
+                better_print("Unable to retrieve the switch's IP address " + str(tunnel_info) + " from the GraphQl response.")
                 return
                 #si la fonction ne retourne rien on verifie et on l affiche une erreur
             else:
-                print("Connection au switch: " + switch_ip)
+                print("Connection to the switch: " + switch_ip)
                 ctx.close()#On ferme la connexion au switch actuel pour eviter que la session reste ouverte
-                ctx.setIpAddress(switch_ip) #on change l IP du switch dans le framework pour se connecter au nouveau switch
+                ctx.setIpAddress(switch_ip) #on change l IP du switch dans the framework pour se connecter au nouveau switch
                 emc_cli.connect() #on se connecte au nouveau switch
                 jump += 1
         else:
-            better_print("La response GraphQL est vide")
+            better_print("the GraphQl response is empty.")
             return
 
     # Verification si la boucle s est arretee avant de trouver la MAC en local
     if not found_local and jump >= jump_limit:
-        better_print("La limite de " + str(jump_limit) + " sauts a ete atteinte. Le nombre de saut est plus important que la limite donnee ou la MAC n a pas ete trouvee.")
-        print("Nombre de saut effectue :" + str(jump))
+        better_print("The limit of " + str(jump_limit) + " jumps has been reached. The number of jumps performed is greater than the given limit or the MAC was not found.")
+        print("Number of jumps performed: " + str(jump))
         if user_input_debug and debug_messages:
-            better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
+            better_print("DEBUG SUMMARY:\n" + "\n".join("- " + msg for msg in debug_messages))
         return
 
     new_command= "sh i-sid mac-address-entry mac "+ mac_cible
@@ -316,17 +316,17 @@ def main():
         parts = result.split()
         status = parts[1]
         port = clean_port(parts[3])
-        better_print("La MAC address " + mac_cible + " (Status: " + status + ") est en local sur le switch : " + get_switch_prompt() + ", port : " + port + ". (Non presente dans I-SID, probablement une adresse du switch)")
+        better_print("The MAC address " + mac_cible + " (Status: " + status + ") is local on the switch: " + get_switch_prompt() + ", port: " + port + ". (Not present in I-SID, probably a switch address)")
         return
     if user_input_debug :
-        debug_msg = "La MAC a ete trouve sur cette ligne : " + nouveau_resultat
+        debug_msg = "The MAC was found on this line: " + nouveau_resultat
         debug_messages.append(debug_msg)
         better_print("DEBUG: " + debug_msg)
     is_local(nouveau_resultat)
     #on verifie si la mac address est en local ou pas sur ce switch
-    print("Nombre de saut effectue :" + str(jump))
+    print("Number of jumps performed: " + str(jump))
 
     # Recapitulatif des debugs a la fin
     if user_input_debug and debug_messages:
-        better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
+        better_print("DEBUG SUMMARY:\n" + "\n".join("- " + msg for msg in debug_messages))
 main()
