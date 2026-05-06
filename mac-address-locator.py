@@ -5,13 +5,13 @@
 #@DetailDescriptionEnd
 #@SectionStart (description = Mac address Locator)
 #    @VariableFieldLabel (
-#        description = Enter MAC,
+#        description = Entrer l adresse MAC,
 #        type = string,
 #        required = yes,
 #        name = userInput_MAC_Address,
 #    )#@SectionEnd
 #    @VariableFieldLabel (
-#        description = Nombre de saut limite entre switch ,
+#        description = Saut Maximum entre switchs. Valeur par default: 5 ,
 #        type = string,
 #        required = no,
 #        name = userInput_Jump_limit,
@@ -34,7 +34,7 @@ ctx = XIQSE(emc_cli, emc_nbi, emc_results, emc_vars)
 
 def execute_cli_command(command):
     '''
-    Executes une commande CLI simple et retourne la réponse brute.
+    Executes une commande CLI simple et retourne la reponse brute.
 
     exemple:
     command="enable"
@@ -46,8 +46,8 @@ def execute_cli_command(command):
 
 def ask_debug():
     '''
-    Regarde si l'utilisateur veut un debug
-    :return: retourne True ou False en fonction de ce que veut l'utilisateur
+    Regarde si l utilisateur veut un debug
+    :return: retourne True ou False en fonction de ce que veut l utilisateur
     '''
     user_input_debug =emc_vars['userInputDebug']
     if user_input_debug=="Enable":
@@ -57,11 +57,11 @@ def ask_debug():
 
 def parse_mac_table_response(raw_response, mac_address):
     '''
-    Cette fonction sert a verifier si l'adresse MAC recherchée
-    est présente dans la réponse brute de la commande CLI.
-    :param raw_response: Réponse brute de la commande CLI
+    Cette fonction sert a verifier si l adresse MAC recherchee
+    est presente dans la reponse brute de la commande CLI.
+    :param raw_response: Reponse brute de la commande CLI
     :param mac_address: Notre Mac address cible
-    :return: retourne la ligne ou est trouvée la mac address
+    :return: retourne la ligne ou est trouvee la mac address
     '''
     for line in raw_response.splitlines():
         if mac_address in line:
@@ -70,10 +70,10 @@ def parse_mac_table_response(raw_response, mac_address):
 
 def get_tunnel(line):
     '''
-    La fonction permet de recuperer le tunnel associé à la ligne de la table MAC ou est trouvée notre adresse MAC cible.
-    Et verifie si l'adresse mac est en local sur le premier switch interrogé
-    :param line: ligne de la table MAC ou est trouvée notre adresse MAC cible
-    :return: Le nom du switch de la colonne tunnel ou bien gagné la mac est local et on renvoie le nom du switch+le port
+    La fonction permet de recuperer le tunnel associe a la ligne de la table MAC ou est trouvee notre adresse MAC cible.
+    Et verifie si l adresse mac est en local sur le premier switch interroge
+    :param line: ligne de la table MAC ou est trouvee notre adresse MAC cible
+    :return: Le nom du switch de la colonne tunnel ou bien gagne la mac est local et on renvoie le nom du switch+le port
     '''
     parts = line.split()
     if len(parts) < 6:
@@ -84,7 +84,7 @@ def get_tunnel(line):
 
 def execute_graphql(query_string):
     '''
-    Execute une requete GraphQL brute et retourne la réponse.
+    Execute une requete GraphQL brute et retourne la reponse.
     :param query_string: Requete GraphQL sous forme de string
     :return: Reponse de la requete GraphQL
      exemple:
@@ -110,10 +110,10 @@ def execute_graphql(query_string):
 
 def get_switch_ip(graphql_response, switch_name):
     '''
-    Cette fonction sert a extraire l'IP du switch à partir de la réponse GraphQL en fonction du nom du switch.
+    Cette fonction sert a extraire l IP du switch a partir de la reponse GraphQL en fonction du nom du switch.
     :param graphql_response: Reponse GraphQL sous forme de string
     :param switch_name: Nom du switch
-    return: IP du switch ou message d'erreur si le switch n'est pas trouvé
+    return: IP du switch ou message d erreur si le switch n est pas trouve
     '''
     try:
         response= graphql_response['network'] ['devices']
@@ -122,14 +122,14 @@ def get_switch_ip(graphql_response, switch_name):
                 return device['ip']
         return
     except KeyError as e:
-        print("KeyError lors de l'extraction de l'IP du switch: " + str(e))
+        print("KeyError lors de l extraction de l IP du switch: " + str(e))
         return "Error: Key not found in GraphQL response"
 
 def is_local(line) :
     '''
     La fonction permet de verifie si la ligne de la table mac fournit est bien en local ou non.
-    :param line: Ligne de la table MAC ou est trouvée notre adresse MAC cible
-    :return: return 1 ou 0 et affiche un message de succes ou d'erreur en fonction du resultat
+    :param line: Ligne de la table MAC ou est trouvee notre adresse MAC cible
+    :return: return 1 ou 0 et affiche un message de succes ou d erreur en fonction du resultat
     '''
     parts = line.split()
     try:
@@ -146,7 +146,7 @@ def is_local(line) :
 
 def get_switch_prompt():
     '''
-    Cette fonction n'envoie rien pour simuler une pression sur la touche "entrée"
+    Cette fonction n envoie rien pour simuler une pression sur la touche entree
     et ainsi recuperer le prompt du switch. Elle est utilisee dans la fonction Islocal.
     :return: le prompt du switch
     '''
@@ -159,12 +159,12 @@ def get_switch_prompt():
             prompt = prompt.replace(":1>", "").strip()
             return prompt
 
-    return "prompt non trouvé"
+    return "prompt non trouve"
 
 def clean_port(port):
     '''
-    Fonction qui sert a nettoyer la sortie du port pour n'afficher que le port
-    :param port: port a nettoyé
+    Fonction qui sert a nettoyer la sortie du port pour n afficher que le port
+    :param port: port a nettoye
     :return: port tout propre
     '''
     if (":" in port):
@@ -177,11 +177,11 @@ def clean_port(port):
 
 def entry_to_correct_format(user_input):
     '''
-    Nettoie l'entrée MAC de tous les symboles, vérifie qu'il reste 12 caractères hexadécimaux,
-    et les colle au format "xx:xx:xx:xx:xx:xx".
-    Accepte n'importe quel format du moment qu'il y a 12 caractères hexadécimaux valides.
-    :param user_input: L'adresse MAC entrée par l'utilisateur
-    :return: L'adresse MAC au format "xx:xx:xx:xx:xx:xx" ou l'entrée d'origine si invalide.
+    Nettoie l entree MAC de tous les symboles verifie qu il reste 12 caracteres hexadecimaux,
+    et les colle au format xx:xx:xx:xx:xx:xx.
+    Accepte n importe quel format du moment qu il y a 12 caracteres hexadecimaux valides.
+    :param user_input: L adresse MAC entree par l utilisateur
+    :return: L adresse MAC au format xx:xx:xx:xx:xx:xx ou l entree d origine si invalide.
     '''
     if user_input is None:
         return user_input
@@ -228,17 +228,17 @@ def main():
     if jump_limit is None or jump_limit<=0 :
         jump_limit = 5
     jump = 0
-    found_local = False  # Flag pour tracker si on a trouvé la MAC en local
-    while jump < jump_limit : #Boucle qui va boucler sur plusieurs switch jusqu'a trouver l'addresse mac en local sur un switch avec un valeur de saut limite defini
+    found_local = False  # Flag pour tracker si on a trouve la MAC en local
+    while jump < jump_limit : #Boucle qui va boucler sur plusieurs switch jusqu a trouver l adresse mac en local sur un switch avec un valeur de saut limite defini
         command = "show vlan mac-address-entry mac " + mac_cible
         raw_response = execute_cli_command(command)
-        #On demande au switch de nous afficher la ligne de la table MAC ou est trouvée notre adresse MAC cible
+        #On demande au switch de nous afficher la ligne de la table MAC ou est trouvee notre adresse MAC cible
         if raw_response is None or "error" in raw_response.lower():
             better_print("Pas de response ou erreur lors de l execution de la commande CLI: " + str(raw_response))
             return
 
         result = parse_mac_table_response(raw_response, mac_cible)
-        #On verifie que la ligne est trouvée sinon on affiche un message d'erreur
+        #On verifie que la ligne est trouvee sinon on affiche un message d erreur
         if result is None:
             better_print("MAC address pas trouvee dans la table MAC du switch actuel")
             return
@@ -248,14 +248,14 @@ def main():
             better_print("DEBUG: " + debug_msg)
 
         tunnel_info = get_tunnel(result)
-        #si on a pas d'erreur alors on recupere le tunnel associé à la ligne de la table MAC ou est trouvée notre adresse MAC cible
+        #si on a pas d erreur alors on recupere le tunnel associe a la ligne de la table MAC ou est trouvee notre adresse MAC cible
         #si la adresse est vu en local on affiche un message de succes
         if (user_input_debug) :
             debug_msg = "Info du tunnel trouve : " + tunnel_info
             debug_messages.append(debug_msg)
             better_print("DEBUG: " + debug_msg)
         if tunnel_info == "LOCAL" :
-            found_local = True  # On marque qu'on a trouvé la MAC en local
+            found_local = True  # On marque qu on a trouve la MAC en local
             break
         raw_query = '''
             query {
@@ -274,28 +274,28 @@ def main():
 
         if graphql_response:
             switch_ip = get_switch_ip(graphql_response, tunnel_info)
-            #on recupere l'IP du switch via son sysName (qui est dans tunnel_info)
+            #on recupere l IP du switch via son sysName (qui est dans tunnel_info)
             if user_input_debug :
-                debug_msg = "L'ip du switch trouve est : " + str(switch_ip)
+                debug_msg = "L ip du switch trouve est : " + str(switch_ip)
                 debug_messages.append(debug_msg)
                 better_print("DEBUG: " + debug_msg)
             if switch_ip is None:
-                better_print("Impossible de recuperer l'IP du switch " + str(tunnel_info) + " depuis la response GraphQL")
+                better_print("Impossible de recuperer l IP du switch " + str(tunnel_info) + " depuis la response GraphQL")
                 return
-                #si la fonction ne retourne rien on verifie et on l'affiche une erreur
+                #si la fonction ne retourne rien on verifie et on l affiche une erreur
             else:
                 print("Connection au switch: " + switch_ip)
                 ctx.close()#On ferme la connexion au switch actuel pour eviter que la session reste ouverte
-                ctx.setIpAddress(switch_ip) #on change l'IP du switch dans le framework pour se connecter au nouveau switch
+                ctx.setIpAddress(switch_ip) #on change l IP du switch dans le framework pour se connecter au nouveau switch
                 emc_cli.connect() #on se connecte au nouveau switch
                 jump += 1
         else:
             better_print("La response GraphQL est vide")
             return
 
-    # Vérification si la boucle s'est arrêtée avant de trouver la MAC en local
+    # Verification si la boucle s est arretee avant de trouver la MAC en local
     if not found_local and jump >= jump_limit:
-        better_print("La limite de " + str(jump_limit) + " sauts a ete atteinte. Le nombre de saut est plus important que la limite donnée ou la MAC n'a pas ete trouvee.")
+        better_print("La limite de " + str(jump_limit) + " sauts a ete atteinte. Le nombre de saut est plus important que la limite donnee ou la MAC n a pas ete trouvee.")
         print("Nombre de saut effectue :" + str(jump))
         if user_input_debug and debug_messages:
             better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
@@ -307,7 +307,7 @@ def main():
     nouvelle_reponse_brute = execute_cli_command(new_command)
     #on recupere la response brute de la commande
     nouveau_resultat = parse_mac_table_response(nouvelle_reponse_brute, mac_cible)
-    #on verifie que la ligne est trouvée
+    #on verifie que la ligne est trouvee
     if nouveau_resultat is None:
         parts = result.split()
         status = parts[1]
@@ -322,7 +322,7 @@ def main():
     #on verifie si la mac address est en local ou pas sur ce switch
     print("Nombre de saut effectue :" + str(jump))
 
-    # Récapitulatif des debugs à la fin
+    # Recapitulatif des debugs a la fin
     if user_input_debug and debug_messages:
         better_print("RECAPITULATIF DES DEBUGS:\n" + "\n".join("- " + msg for msg in debug_messages))
 main()
