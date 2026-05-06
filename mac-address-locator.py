@@ -25,6 +25,7 @@ import re
 # Initialisation du framework XIQSE de Thibault Chevalleraud
 from XIQSE import XIQSE
 ctx = XIQSE(emc_cli, emc_nbi, emc_results, emc_vars)
+
 def execute_cli_command(command):
     '''
     Executes une commande CLI simple et retourne la réponse brute.
@@ -183,7 +184,7 @@ def entry_to_correct_format(user_input):
     hexchars = re.sub(r'[^0-9a-f]', '', s)
     if len(hexchars) == 12:
         return ':'.join(hexchars[i:i+2]for i in range(0, len(hexchars),2))
-    print("Erreur: entree MAC invalide "+ user_input +". Format attendu doit comporter 12 characteres hexa.")
+    better_print("Erreur: entree MAC invalide "+ user_input +". Le format attendu doit comporter 12 characteres en hexadecimal.")
     return None
 
 def better_print(string):
