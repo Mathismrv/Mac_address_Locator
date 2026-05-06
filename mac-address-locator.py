@@ -11,8 +11,8 @@
 #        name = userInput_MAC_Address,
 #    )#@SectionEnd
 #    @VariableFieldLabel (
-#        description = Saut Maximum entre switchs. Valeur par default: 5 ,
-#        type = string,
+#        description = Saut Maximum entre switchs. Valeur par default 5 ,
+#        type = int,
 #        required = no,
 #        name = userInput_Jump_limit,
 #    )#@SectionEnd
@@ -26,6 +26,8 @@
 #    )#@SectionEnd
 #@MetaDataEnd
 '''
+
+version = "0.8"
 
 import re
 # Initialisation du framework XIQSE de Thibault Chevalleraud
@@ -223,9 +225,11 @@ def main():
     print("Debut de la recherche :")
     print("="*100)
 
-
-    jump_limit = int(emc_vars['userInput_Jump_limit'])
-    if jump_limit is None or jump_limit<=0 :
+    if emc_vars['userInput_Jump_limit'] is None :
+        jump_limit = 5
+    else:
+        jump_limit = emc_vars['userInput_Jump_limit']
+    if jump_limit<=0 :
         jump_limit = 5
     jump = 0
     found_local = False  # Flag pour tracker si on a trouve la MAC en local
