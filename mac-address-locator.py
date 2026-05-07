@@ -1,3 +1,15 @@
+"""
+MAC Adress Locator for VOSS/Fabric Engine
+=========================================
+Description : This script allows you to find the tunnel associated with a given MAC address in a VOSS/Fabric Engine network.
+It works by querying the MAC address table of the switch to find the tunnel information associated with the MAC address, then uses GraphQL to retrieve the
+IP address of the next switch in the path, and iteratively continues this process until it finds the switch where the MAC address is local or reaches a defined jump limit.
+
+Autor: Mathis Morvant
+Dependancies : XIQSE SDK by Thibault Chevalleraud
+"""
+
+
 '''
 #@MetaDataStart
 #@DetailDescriptionStart
@@ -27,7 +39,7 @@
 #@MetaDataEnd
 '''
 
-version = "0.8"
+version = "0.9"
 
 import re
 # Initialisation du framework XIQSE de Thibault Chevalleraud
