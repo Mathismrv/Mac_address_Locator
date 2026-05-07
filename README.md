@@ -123,6 +123,6 @@ La fonction `main()` contient toute la logique pour localiser l'adresse MAC. Voi
 5. Sinon, utilise GraphQL pour récupérer l'IP du switch suivant via son nom
 6. Ferme la connexion actuelle et se reconnecte au switch suivant
 7. Incrémente le compteur de sauts et boucle
-8. Après la boucle, vérifie que la MAC est bien en local avec la commande `sh i-sid mac-address-entry`
-9. Affiche les résultats (nom du switch, port) ou un message d'erreur
-10. Affiche le nombre de sauts effectués et un résumé debug si activé
+8. Après la boucle, le script vérifie que la MAC est bien en local avec la commande `sh i-sid mac-address-entry`
+9. Il affiche les résultats (nom du switch, port) ou un message d'erreur
+10. ET affiche le nombre de sauts effectués et un résumé debug si activé

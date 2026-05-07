@@ -237,6 +237,20 @@ def main():
     print("Start search :")
     print("="*100)
 
+    raw_query = '''
+        query {
+            network {
+                devices {
+                    ip
+                    sysName
+                }
+            }
+        }
+    '''
+    # requete GraphQL pour recupere la liste des IP de tous les switchs dans la fabric avec leur sysName pour recupere celui qui nous interesse
+
+    graphql_response = execute_graphql(raw_query)     # on execute notre commande GraphQL et on stocke la reponse
+
     if emc_vars['userInput_Jump_limit'] is None :
         jump_limit = 5
     else:
@@ -273,20 +287,6 @@ def main():
         if tunnel_info == "LOCAL" :
             found_local = True  # On marque qu on a trouve la MAC en local
             break
-        raw_query = '''
-            query {
-                network {
-                    devices {
-                        ip
-                        sysName
-                    }
-                }
-            }
-        '''
-        #requete GraphQL pour recupere la liste des IP de tous les switchs dans la fabric avec leur sysName pour recupere celui qui nous interesse
-
-        graphql_response = execute_graphql(raw_query)
-        #on execute notre commande
 
         if graphql_response:
             switch_ip = get_switch_ip(graphql_response, tunnel_info)
