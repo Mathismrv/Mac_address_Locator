@@ -37,23 +37,36 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 
 ## Fonctions
 
-### `is_local(line)`
-Cette fonction vérifie si la ligne rentrée contient le mot "LOCAL" ou "NON-LOCAL" pour déterminer si l'adresse MAC est en local sur le switch ou pas.
-- **param line** : ligne de la table MAC où est trouvée notre adresse MAC cible.
-- **return** : retourne 0 ou 1 et un message pour indiquer si la MAC est locale ou non.
-
 ### `execute_cli_command(command)`
 Exécute une commande CLI simple et retourne la réponse brute.
+- **param command** : Commande CLI à exécuter.
+- **return** : Réponse brute de la commande.
+
 **Exemple :**
 ```python
 command = "enable"
-execute_cli_command(command)
+output = execute_cli_command(command)
 ```
+
+### `ask_debug()`
+Regarde si l'utilisateur veut un debug en vérifiant la variable `userInputDebug`.
+- **return** : retourne True ou False en fonction de ce que veut l'utilisateur
+
+### `parse_mac_table_response(raw_response, mac_address)`
+Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans la réponse brute de la commande CLI.
+- **param raw_response** : Réponse brute de la commande CLI.
+- **param mac_address** : Notre MAC address cible.
+- **return** : retourne la ligne où est trouvée l'adresse MAC, ou None si non trouvée.
+
+### `get_tunnel(line)`
+La fonction permet de récupérer le tunnel associé à la ligne de la table MAC où est trouvée notre adresse MAC cible.
+- **param line** : Ligne de la table MAC où est trouvée notre adresse MAC cible.
+- **return** : Le nom du switch de la colonne tunnel, ou "LOCAL" si la MAC est locale.
 
 ### `execute_graphql(query_string)`
 Exécute une requête GraphQL brute et retourne la réponse.
 - **param query_string** : Requête GraphQL sous forme de string.
-- **return** : Réponse de la requête GraphQL.
+- **return** : Réponse de la requête GraphQL en dictionnaire/liste, ou None en cas d'erreur.
 
 **Exemple :**
 ```python
@@ -71,57 +84,45 @@ raw_response = execute_graphql(raw_query)
 print("GraphQL response: " + str(raw_response))
 ```
 
-### `get_switch_ip(GraphQl_response, Switch_Name)`
+### `get_switch_ip(graphql_response, switch_name)`
 Cette fonction sert à extraire l'IP du switch à partir de la réponse GraphQL en fonction du nom du switch.
-- **param GraphQl_response** : Réponse GraphQL sous forme de dictionnaire/liste.
-- **param Switch_Name** : Nom du switch.
-- **return** : IP du switch ou message d'erreur si le switch n'est pas trouvé.
+- **param graphql_response** : Réponse GraphQL sous forme de dictionnaire/liste.
+- **param switch_name** : Nom du switch à chercher.
+- **return** : IP du switch trouvé, None ou message d'erreur si le switch n'est pas trouvé.
 
-### `get_tunnel(line)`
-La fonction permet de récupérer le tunnel associé à la ligne de la table MAC où est trouvée notre adresse MAC cible. Et vérifie si l'adresse MAC est en local sur le premier switch interrogé.
-- **param line** : ligne de la table MAC où est trouvée notre adresse MAC cible.
-- **return** : Le nom du switch de la colonne tunnel ou bien, si la MAC est locale, on renvoi le nom du switch + le port.
+### `is_local(line)`
+Cette fonction vérifie si la ligne rentrée contient le mot "LOCAL" ou "NON-LOCAL" pour déterminer si l'adresse MAC est en local sur le switch ou pas.
+- **param line** : Ligne de la table MAC (format i-sid) où est trouvée notre adresse MAC cible.
+- **return** : retourne 1 si LOCAL, 0 si NON-LOCAL, -1 en cas d'erreur d'index.
 
 ### `get_switch_prompt()`
-Cette fonction n'exécute aucune commande pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `is_local()`.
-- **return** : Le prompt du switch.
+Cette fonction envoie une commande vide pour simuler une pression sur la touche "entrée" et ainsi récupérer le prompt du switch. Elle est utilisée dans la fonction `is_local()`.
+- **return** : Le prompt du switch (sans le préfixe ":1>").
 
-### `parse_mac_table_response(raw_response, mac_address)`
-Cette fonction sert à vérifier si l'adresse MAC recherchée est présente dans la réponse brute de la commande CLI.
-- **param raw_response** : Réponse brute de la commande CLI.
-- **param mac_address** : Notre MAC address cible.
-- **return** : retourne la ligne où est trouvée l'adresse MAC.
-
-### `entry_to_correct_format(UserInput)`
-Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne récupérant que les caractères qui ressemble à de l'hexadécimal et reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX"
-- **param UserInput**: L'adresse MAC entrée par l'utilisateur
-- **return**: L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX" ou un message d'erreur si le format n'est pas accepté
+### `entry_to_correct_format(user_input)`
+Cette fonction permet de nettoyer l'adresse MAC donnée par l'utilisateur en supprimant tous symboles et en ne récupérant que les caractères hexadécimaux, puis reconstruit l'adresse MAC sous le format "XX:XX:XX:XX:XX:XX".
+- **param user_input** : L'adresse MAC entrée par l'utilisateur (accepte n'importe quel format avec 12 caractères hex).
+- **return** : L'adresse MAC formatée sous la forme "XX:XX:XX:XX:XX:XX", ou None si le format n'est pas valide.
 
 ### `clean_port(port)`
-Fonction qui sert à nettoyer la sortie du port pour n'afficher que le port
-- **param port**: port à nettoyer
-- **return**: port tout propre
+Fonction qui sert à nettoyer la sortie du port pour n'afficher que le numéro de port.
+- **param port** : Port à nettoyer (peut être au format "port:X" ou "port-X").
+- **return** : Port nettoyé (juste le numéro).
 
-### `ask_debug()`
-Regarde si l'utilisateur veut un debug
-- **return**: retourne True ou False en fonction de ce que veut l'utilisateur
-
-### `better_print(String):`
-Fonction qui permet une meilleure lisibilité dans le terminal de ExtremeCloud
-- **param String**: une chaîne de caractère qui va être rendu plus lisible
+### `better_print(string)`
+Fonction qui permet une meilleure lisibilité dans le terminal de ExtremeCloud en encadrant le texte avec des traits.
+- **param string** : Une chaîne de caractère qui va être rendue plus lisible.
 
 
 ### `main()`
-La fonction `main()` contient toute la logique pour localiser l'adresse MAC, voici les grosses étapes du main:
-- Elle récupère l'entrée de l'utilisateur la nettoie
-- Entre dans une boucle puis interroge le switch choisi au début pour savoir s'il la connaît
-- Ensuite on récupère la ligne où notre Mac a été trouvée et on regarde si un tunnel existe
-- On vérifie si la MAC n'est pas déjà en local sur le premier switch interrogé
-- Si oui, on sort de la boucle
-- Sinon on doit se connecter au switch que le tunnel affiche
-- On récupère donc l'IP de ce switch via son nom récupéré par le tunnel
-- On se connecte à celui-ci et on boucle
-- FIN de boucle :
-- On vérifie que notre MAC est bien en local
-- Sinon, alors notre MAC n'est pas sur ce switch, le script affiche une erreur et s'arrête
-- Si elle est en local, c'est fini, on affiche nos résultats (IP du switch, le port, et l'adresse MAC)
+La fonction `main()` contient toute la logique pour localiser l'adresse MAC. Voici les étapes du main:
+1. Elle récupère l'entrée de l'utilisateur et la nettoie
+2. Entre dans une boucle (jusqu'à `jump_limit`) puis interroge le switch choisi au début pour savoir s'il connaît la MAC
+3. Récupère la ligne où la MAC a été trouvée et extrait le tunnel associé
+4. Si tunnel = "LOCAL", sort de la boucle (MAC trouvée en local sur le switch)
+5. Sinon, utilise GraphQL pour récupérer l'IP du switch suivant via son nom
+6. Ferme la connexion actuelle et se reconnecte au switch suivant
+7. Incrémente le compteur de sauts et boucle
+8. Après la boucle, vérifie que la MAC est bien en local avec la commande `sh i-sid mac-address-entry`
+9. Affiche les résultats (nom du switch, port) ou un message d'erreur
+10. Affiche le nombre de sauts effectués et un résumé debug si activé
