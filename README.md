@@ -16,14 +16,16 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 
    ![Task](Images/0.png) ![Add](Images/2'.png) ![Ajouter](Images/3.png)
 
-5. Assurez-vous de donner les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL :
+5. Assurez-vous de donner les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL et dans "Menu" selectionnez "Device" pour que le script puisse être exécuté depuis les pages de vos switchs.
+Selectionnez egalement un groupe dans lequel 
 
-   ![Droits](Images/2.png)
+   ![Droits](Images/Droit_et_groupe.png)
 
 ### Étape 4 : Exécuter le script
-6. Exécutez le script en le sélectionnant et en cliquant sur "Run" :
+6. Pour executer le script, rendez-vous dans l'onglet Network, choisissez un switch sur lequel executer le programme (click droit), allez dans l'onglet Task, choisissez le groupe dans lequel vous)
+vous avez ajouté le script, puis cliquez sur le script.
 
-   ![Exécuter](Images/5.png)
+   ![Exécuter](Images/run.png)
 
 ### Étape 5 : Entrer l'adresse MAC
 7. Choississez un switch de départ et entrez l'adresse MAC que vous souhaitez localiser, le nombre de saut maximum (valeur par default 5) et le mode debug (non obligatoire).
