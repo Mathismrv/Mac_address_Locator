@@ -19,7 +19,7 @@ Le script interroge les tables MAC des switchs de la fabric pour trouver une adr
 5. Assurez-vous de donner les droits nécessaires pour que le script puisse exécuter des commandes CLI et GraphQL et dans "Menu" selectionnez "Device" pour que le script puisse être exécuté depuis les pages de vos switchs.
 Selectionnez également un groupe dans lequel vous le retrouverez facilement.
 
-   ![Droits](Images/Droit_et_groupe.png)
+   ![Droits](Images/Droits_et_groupe.png)
 
 ### Étape 4 : Exécuter le script
 6. Pour executer le script, rendez-vous dans l'onglet Network, choisissez un switch sur lequel executer le programme (click droit), allez dans l'onglet Tasks, choisissez le groupe dans lequel
